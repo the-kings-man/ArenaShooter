@@ -7,7 +7,119 @@
   <persistent>0</persistent>
   <parentName>&lt;undefined&gt;</parentName>
   <maskName>&lt;undefined&gt;</maskName>
-  <events/>
+  <events>
+    <event eventtype="0" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Create server
+
+//TODO: Move these to the menu object when ready, as there could potentially be more than 1 server object
+global.game_server_type = network_socket_tcp;
+global.game_server_port = 6510;
+global.game_server_maxplayers = 16;
+
+socketList = ds_list_create();
+clientMap = ds_map_create();
+
+server = network_create_server(global.game_server_type, global.game_server_port, global.game_server_maxplayers);
+if (server &lt; 0) {
+    //Error creating server, abort
+    //TODO: Handle this better, because we don't just want to quit, we want to
+    //      make this thing create a server no matter what.
+    ds_list_destroy(socketList);
+    ds_map_destroy(clientMap);
+    instance_destroy();
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="7" enumb="68">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>var eventid = ds_map_find_value(async_load, "id"); //EventID is the socket ID in this case
+
+if (eventid == server) {
+    //This means we have a client connecting/disconnecting
+    var socket = ds_map_find_value(async_load, "socket"); //The socket id of the connection
+    var type = ds_map_find_value(async_load, "type"); //type is whether it's connecting or disconnecting
+    switch (type) {
+        case network_type_connect: //Connect a client
+            ds_list_add(socketList, socket);
+            break;
+        case network_type_disconnect: //Disconnect a client
+            ds_list_delete(socketList, ds_list_find_index(socketList, socket));
+            break;
+        case network_type_data:
+            //TODO: Handle data, not sure if we will ever use this? I have no idea of applications - DW
+            break;
+    }
+} else if (eventid == global.client) {
+    //The client which is running the server, do nothing
+} else {
+    //All other clients, which means we have received data
+    
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="8" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>for (var i = 0; i &lt; ds_list_size(socketList); i++) {
+    draw_text(10, 10 + i * 25, ds_list_find_value(socketList, i));
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+  </events>
   <PhysicsObject>0</PhysicsObject>
   <PhysicsObjectSensor>0</PhysicsObjectSensor>
   <PhysicsObjectShape>0</PhysicsObjectShape>
