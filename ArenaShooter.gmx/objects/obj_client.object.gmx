@@ -36,6 +36,45 @@ if (server &lt; 0) {
 } else {
     //Connected
 }
+
+testName = "";
+global.clientSocket = clientSocket;
+
+testObjList = ds_list_create();
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="3" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>//NOTE: This is test code to test the testName variable
+if (keyboard_check(vk_left)) {
+    x -= 5;
+} else if (keyboard_check(vk_right)) {
+    x += 5;
+}
+
+if (keyboard_check(vk_up)) {
+    y -= 5;
+} else if (keyboard_check(vk_down)) {
+    y += 5;
+}
 </string>
           </argument>
         </arguments>
@@ -62,6 +101,50 @@ if (server &lt; 0) {
 
 if (eventid == clientSocket) {
     //Handle the data received from the server
+    
+    var buf = ds_map_find_value(async_load, "buffer");
+    
+    var command = buffer_read(buf, buffer_u8);
+    
+    switch (command) {
+        case TEST_SEND_DATA:
+            testName = buffer_read(buf, buffer_string);
+            
+            var numTestObjs = buffer_read(buf, buffer_u8);
+            ds_list_clear(testObjList);
+            for (var i = 0; i &lt; numTestObjs; i++) {
+                ds_list_add(testObjList, buffer_read(buf, buffer_s16));
+                ds_list_add(testObjList, buffer_read(buf, buffer_s16));
+            }
+            break;
+    }
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="8" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>draw_text(x, y, testName);
+
+for (var i = 0; i &lt; ds_list_size(testObjList); i++) {
+    draw_circle(ds_list_find_value(testObjList, i++), ds_list_find_value(testObjList, i), 5, false);
 }
 </string>
           </argument>

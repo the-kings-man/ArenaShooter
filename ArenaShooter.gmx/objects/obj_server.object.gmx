@@ -44,6 +44,56 @@ if (server &lt; 0) {
     ds_map_destroy(clientMap);
     instance_destroy();
 }
+
+//TEMP code to test client drawing
+testBuf = buffer_create(256, buffer_grow, 1);
+instance_create(100, 100, obj_test);
+instance_create(20, 20, obj_test);
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="3" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>
+testBuf = buffer_create(256, buffer_grow, 1);
+global.testBuf = testBuf;
+
+buffer_seek(testBuf, buffer_seek_start, 0);
+
+//Constant value tells the client how to process the data
+buffer_write(testBuf, buffer_u8, TEST_SEND_DATA); 
+//data to process
+buffer_write(testBuf, buffer_string, "testing");
+
+//write test object data
+buffer_write(testBuf, buffer_u8, instance_number(obj_test));
+with (obj_test) {
+    buffer_write(global.testBuf, buffer_s16, x);
+    buffer_write(global.testBuf, buffer_s16, y);
+}
+
+//Send data to clients
+var bufSize = buffer_tell(testBuf);
+for (var i = 0; i &lt; ds_list_size(socketList); i++) {
+    network_send_packet(ds_list_find_value(socketList, i), testBuf, bufSize);
+}
 </string>
           </argument>
         </arguments>
@@ -70,24 +120,12 @@ if (server &lt; 0) {
 
 if (eventid == server) {
     //This means we have a client connecting/disconnecting
-    var socket = ds_map_find_value(async_load, "socket"); //The socket id of the connection
-    var type = ds_map_find_value(async_load, "type"); //type is whether it's connecting or disconnecting
-    switch (type) {
-        case network_type_connect: //Connect a client
-            ds_list_add(socketList, socket);
-            break;
-        case network_type_disconnect: //Disconnect a client
-            ds_list_delete(socketList, ds_list_find_index(socketList, socket));
-            break;
-        case network_type_data:
-            //TODO: Handle data, not sure if we will ever use this? I have no idea of applications - DW
-            break;
-    }
-} else if (eventid == global.client) {
+    scr_server_connectDisconnect();
+} else if (eventid == global.clientSocket) {
     //The client which is running the server, do nothing
 } else {
     //All other clients, which means we have received data
-    
+    scr_server_receivedData();
 }
 </string>
           </argument>
