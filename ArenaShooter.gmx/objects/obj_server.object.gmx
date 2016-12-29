@@ -85,6 +85,7 @@ buffer_write(testBuf, buffer_string, "testing");
 //write test object data
 buffer_write(testBuf, buffer_u8, instance_number(obj_test));
 with (obj_test) {
+    buffer_write(global.testBuf, buffer_s16, color);
     buffer_write(global.testBuf, buffer_s16, x);
     buffer_write(global.testBuf, buffer_s16, y);
 }

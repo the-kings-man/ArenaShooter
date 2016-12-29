@@ -27,6 +27,7 @@
             <kind>1</kind>
             <string>vspeed = 4;
 hspeed = 4;
+color = c_black;
 </string>
           </argument>
         </arguments>
@@ -49,8 +50,12 @@ hspeed = 4;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if (x &gt; room_width || x &lt; 0) hspeed = -hspeed;
-if (y &gt; room_height || y &lt; 0) vspeed = -vspeed;
+            <string>if (x &gt; room_width || x &lt; 0) { 
+    hspeed = -hspeed;
+}
+if (y &gt; room_height || y &lt; 0) {
+    vspeed = -vspeed;
+}
 </string>
           </argument>
         </arguments>

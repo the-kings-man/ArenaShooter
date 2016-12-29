@@ -19,13 +19,15 @@
         <exetype>2</exetype>
         <functionname></functionname>
         <codestring></codestring>
-        <whoName>self</whoName>
+        <whoName>other</whoName>
         <relative>0</relative>
         <isnot>0</isnot>
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>clientSocket = network_create_socket(global.game_server_type);
+            <string>///Connect the client, setup test variables
+//Connect the client
+clientSocket = network_create_socket(global.game_server_type);
 
 var server = network_connect(clientSocket, "127.0.0.1", global.game_server_port);
 if (server &lt; 0) {
@@ -37,10 +39,33 @@ if (server &lt; 0) {
     //Connected
 }
 
-testName = "";
 global.clientSocket = clientSocket;
 
 testObjList = ds_list_create();
+testName = "";
+testInput = c_black;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Setup client variables
+buff = buffer_create(256, buffer_grow, 1);
 </string>
           </argument>
         </arguments>
@@ -113,8 +138,9 @@ if (eventid == clientSocket) {
             var numTestObjs = buffer_read(buf, buffer_u8);
             ds_list_clear(testObjList);
             for (var i = 0; i &lt; numTestObjs; i++) {
-                ds_list_add(testObjList, buffer_read(buf, buffer_s16));
-                ds_list_add(testObjList, buffer_read(buf, buffer_s16));
+                ds_list_add(testObjList, buffer_read(buf, buffer_s16)); //color
+                ds_list_add(testObjList, buffer_read(buf, buffer_s16)); //x
+                ds_list_add(testObjList, buffer_read(buf, buffer_s16)); //y
             }
             break;
     }
@@ -144,8 +170,73 @@ if (eventid == clientSocket) {
             <string>draw_text(x, y, testName);
 
 for (var i = 0; i &lt; ds_list_size(testObjList); i++) {
+    draw_set_color(ds_list_find_value(testObjList, i++));
     draw_circle(ds_list_find_value(testObjList, i++), ds_list_find_value(testObjList, i), 5, false);
 }
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="9" enumb="32">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Test player input recognised on server
+buffer_seek(buff, buffer_seek_start, 0);
+
+buffer_write(buff, buffer_u8, TEST_SEND_DATA);
+
+buffer_write(buff, buffer_s16, vk_space);
+
+buffer_write(buff, buffer_bool, true);
+
+network_send_packet(clientSocket, buff, buffer_tell(buff));
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="10" enumb="32">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Test player input recognised on server
+buffer_seek(buff, buffer_seek_start, 0);
+
+buffer_write(buff, buffer_u8, TEST_SEND_DATA);
+
+buffer_write(buff, buffer_s16, vk_space);
+
+buffer_write(buff, buffer_bool, false);
+
+network_send_packet(clientSocket, buff, buffer_tell(buff));
 </string>
           </argument>
         </arguments>
