@@ -21,5 +21,8 @@
                 }
             }
             break;
+        case TEST_SEND_PLAYER_DATA:
+            //TODO: Fill this in sso that player speed and direction data will be processed
+            break;
     }
 }

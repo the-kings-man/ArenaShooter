@@ -70,6 +70,35 @@ buff = buffer_create(256, buffer_grow, 1);
           </argument>
         </arguments>
       </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Initialise Gamepads and Players
+players = ds_map_create();
+
+var gp_num = gamepad_get_device_count();
+for (var i = 0; i &lt; gp_num; i++) {
+    if (gamepad_is_connected(i)) {
+        show_debug_message("Gamepad " + string(i) + " is connected.");
+    }
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
     </event>
     <event eventtype="3" enumb="0">
       <action>
@@ -99,6 +128,71 @@ if (keyboard_check(vk_up)) {
     y -= 5;
 } else if (keyboard_check(vk_down)) {
     y += 5;
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Check if data has to be sent to server, send it if it should be
+
+scr_client_sendData();
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="7" enumb="75">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Connect/disconnect players
+var e_type = ds_map_find_value(async_load, "event_type");
+
+var pad_index = ds_map_find_value(async_load, "pad_index");
+
+show_debug_message("event type: " + e_type + "#pad index:" + string(pad_index));
+
+switch (e_type) {
+    case "gamepad discovered":
+        var player = instance_create(100, 100 + 50 * pad_index, obj_player);
+        ds_map_add(players, pad_index, player);
+        player.pad_index = pad_index;
+        player.is_client = true;
+        gamepad_set_axis_deadzone(pad_index, 0.15);
+    break;
+    case "gamepad lost":
+        with (players[? pad_index]) instance_destroy();
+        ds_map_delete(players, pad_index);
+    break;
 }
 </string>
           </argument>
