@@ -3,7 +3,7 @@
     var player = argument0;
     var doSend = false;
     with (player) {
-        if (move_h != move_h_prev || move_v != move_v_prev)
+        if (speed != speed_prev || direction != direction_prev)
             doSend = true;
     }
     return doSend;

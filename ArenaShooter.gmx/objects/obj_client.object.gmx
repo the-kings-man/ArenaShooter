@@ -41,6 +41,8 @@ if (server &lt; 0) {
 
 global.clientSocket = clientSocket;
 
+clientMap = ds_map_create();
+
 testObjList = ds_list_create();
 testName = "";
 testInput = c_black;
@@ -117,7 +119,7 @@ for (var i = 0; i &lt; gp_num; i++) {
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>//NOTE: This is test code to test the testName variable
+            <string>///NOTE: This is test code to test the testName variable
 if (keyboard_check(vk_left)) {
     x -= 5;
 } else if (keyboard_check(vk_right)) {
@@ -149,9 +151,9 @@ if (keyboard_check(vk_up)) {
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Check if data has to be sent to server, send it if it should be
+            <string>///Check if player data has to be sent to server, send it if it should be
 
-scr_client_sendData();
+scr_client_sendPlayerData();
 </string>
           </argument>
         </arguments>
@@ -183,15 +185,19 @@ show_debug_message("event type: " + e_type + "#pad index:" + string(pad_index));
 
 switch (e_type) {
     case "gamepad discovered":
-        var player = instance_create(100, 100 + 50 * pad_index, obj_player);
+        var player = instance_create(100, 100 + 50 * pad_index, obj_cli_playerController);
         ds_map_add(players, pad_index, player);
         player.pad_index = pad_index;
         player.is_client = true;
         gamepad_set_axis_deadzone(pad_index, 0.15);
+        
+        scr_client_sendPlayerConnection(pad_index, true);
     break;
     case "gamepad lost":
         with (players[? pad_index]) instance_destroy();
         ds_map_delete(players, pad_index);
+        
+        scr_client_sendPlayerConnection(pad_index, false);
     break;
 }
 </string>
@@ -216,28 +222,11 @@ switch (e_type) {
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>var eventid = ds_map_find_value(async_load, "id");
+            <string>///Process incoming data
+var eventid = ds_map_find_value(async_load, "id");
 
 if (eventid == clientSocket) {
-    //Handle the data received from the server
-    
-    var buf = ds_map_find_value(async_load, "buffer");
-    
-    var command = buffer_read(buf, buffer_u8);
-    
-    switch (command) {
-        case TEST_SEND_DATA:
-            testName = buffer_read(buf, buffer_string);
-            
-            var numTestObjs = buffer_read(buf, buffer_u8);
-            ds_list_clear(testObjList);
-            for (var i = 0; i &lt; numTestObjs; i++) {
-                ds_list_add(testObjList, buffer_read(buf, buffer_s16)); //color
-                ds_list_add(testObjList, buffer_read(buf, buffer_s16)); //x
-                ds_list_add(testObjList, buffer_read(buf, buffer_s16)); //y
-            }
-            break;
-    }
+    scr_client_receivedServerData();
 }
 </string>
           </argument>

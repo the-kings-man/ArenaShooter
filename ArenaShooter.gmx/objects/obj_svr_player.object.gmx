@@ -26,8 +26,8 @@
           <argument>
             <kind>1</kind>
             <string>///Initialisation
+socket = -1;
 pad_index = -1;
-is_client = false;
 </string>
           </argument>
         </arguments>
@@ -51,6 +51,12 @@ is_client = false;
             <string>///Movement Variables
 
 movSpd = 4;
+
+move_h = 0;
+move_v = 0;
+
+speed_prev = -1;
+direction_prev = -1;
 </string>
           </argument>
         </arguments>
@@ -59,45 +65,26 @@ movSpd = 4;
     <event eventtype="3" enumb="0">
       <action>
         <libid>1</libid>
-        <id>612</id>
-        <kind>0</kind>
+        <id>603</id>
+        <kind>7</kind>
         <userelative>0</userelative>
-        <isquestion>-1</isquestion>
+        <isquestion>0</isquestion>
         <useapplyto>-1</useapplyto>
-        <exetype>1</exetype>
-        <functionname>action_if_variable</functionname>
+        <exetype>2</exetype>
+        <functionname></functionname>
         <codestring></codestring>
         <whoName>self</whoName>
         <relative>0</relative>
         <isnot>0</isnot>
         <arguments>
           <argument>
-            <kind>0</kind>
-            <string>is_client</string>
-          </argument>
-          <argument>
-            <kind>0</kind>
-            <string>1</string>
-          </argument>
-          <argument>
-            <kind>4</kind>
-            <string>0</string>
+            <kind>1</kind>
+            <string>///Set previous move variables
+direction_prev = direction;
+speed_prev = speed;
+</string>
           </argument>
         </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>422</id>
-        <kind>1</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
       </action>
       <action>
         <libid>1</libid>
@@ -117,10 +104,7 @@ movSpd = 4;
             <kind>1</kind>
             <string>///Move, turn, shoot
 
-/////////////////// MOVE  //////////////////////////
-var move_h = gamepad_axis_value(pad_index, gp_axislh);
-var move_v = gamepad_axis_value(pad_index, gp_axislv);
-
+/////////////////// MOVE  //////////////////////////\
 if (move_h != 0 || move_v != 0) {
     var dir = point_direction(0, 0, move_h, move_v);
     var spd = min(abs(move_h) + abs(move_v), 1);
@@ -137,10 +121,12 @@ if (move_h != 0 || move_v != 0) {
           </argument>
         </arguments>
       </action>
+    </event>
+    <event eventtype="8" enumb="0">
       <action>
         <libid>1</libid>
-        <id>424</id>
-        <kind>2</kind>
+        <id>605</id>
+        <kind>0</kind>
         <userelative>0</userelative>
         <isquestion>0</isquestion>
         <useapplyto>0</useapplyto>
@@ -150,9 +136,13 @@ if (move_h != 0 || move_v != 0) {
         <whoName>self</whoName>
         <relative>0</relative>
         <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>for testing only</string>
+          </argument>
+        </arguments>
       </action>
-    </event>
-    <event eventtype="8" enumb="0">
       <action>
         <libid>1</libid>
         <id>603</id>
@@ -169,9 +159,8 @@ if (move_h != 0 || move_v != 0) {
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>draw_circle(x, y, 10, false);
-
-draw_text(x, y - 25, "Speed: " + string(speed) + ", lh: " + string(gamepad_axis_value(pad_index, gp_axislh)) + ", lv: " + string(gamepad_axis_value(pad_index, gp_axislv)));
+            <string>draw_set_color(c_red);
+draw_text(x, y + 25, "Speed: " + string(speed) + ", lh: " + string(move_h) + ", lv: " + string(move_v));
 </string>
           </argument>
         </arguments>

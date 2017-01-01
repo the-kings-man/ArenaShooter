@@ -17,17 +17,25 @@
             doSend = true;
             numPlayers++;
             buffer_write(buff, buffer_u8, pad_index);
-            buffer_write(buff, buffer_s16, player.speed);
-            buffer_write(buff, buffer_s16, player.direction);
+            buffer_write(buff, buffer_f32, player.move_h);
+            buffer_write(buff, buffer_f32, player.move_v);
         }
         
         pad_index = ds_map_find_next(players, pad_index);
     }
     
     if (doSend) {
-        buffer_seek(buff, buffer_seek_start, 1); // TODO: Check if this is correct syntax to overwrite number players data
+        //bufferSize is set here so that we send only data relevant to this script call,
+        //as the buffer can be bigger than this as we keep writing to it on and off
+        //throughout the existance of this client instance
+        var bufferSize = buffer_tell(buff);
+        
+        //Write the number of players in it's position
+        buffer_seek(buff, buffer_seek_start, 1);
         buffer_write(buff, buffer_u8, numPlayers);
         
-        network_send_packet(clientSocket, buff, buffer_tell(buff));
+        network_send_packet(clientSocket, buff, bufferSize);
+        
+        show_debug_message("CLIENT IS SENDING PLAYER DATA TO SERVER: buffer size:" + string(bufferSize));
     }
 }
