@@ -65,7 +65,7 @@
             buffer_write(buff, buffer_u8, CONNECTION_DATA_PLAYER); //Whether it's player or client connection data
             buffer_write(buff, buffer_u8, socket);
             buffer_write(buff, buffer_u8, pad_index);
-            buffer_write(buff, buffer_u8, isConnected);
+            buffer_write(buff, buffer_bool, isConnected);
             buffer_write(buff, buffer_s16, playerMap[? pad_index].x); //x of player instance
             buffer_write(buff, buffer_s16, playerMap[? pad_index].y); //y of player instance
             

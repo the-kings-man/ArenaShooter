@@ -191,13 +191,13 @@ switch (e_type) {
         player.is_client = true;
         gamepad_set_axis_deadzone(pad_index, 0.15);
         
-        scr_client_sendPlayerConnection(pad_index, true);
+        scr_client_sendPlayerConnection(pad_index, CONNECTION_DATA_CONNECTED);
     break;
     case "gamepad lost":
         with (players[? pad_index]) instance_destroy();
         ds_map_delete(players, pad_index);
         
-        scr_client_sendPlayerConnection(pad_index, false);
+        scr_client_sendPlayerConnection(pad_index, CONNECTION_DATA_DISCONNECTED);
     break;
 }
 </string>

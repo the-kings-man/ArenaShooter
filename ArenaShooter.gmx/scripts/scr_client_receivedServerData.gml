@@ -25,7 +25,7 @@
             if (isPlayer) {
                 var socket = buffer_read(buf, buffer_u8);
                 var pad_index = buffer_read(buf, buffer_u8);
-                var isConnected = buffer_read(buf, buffer_u8);
+                var isConnected = buffer_read(buf, buffer_bool);
                 var playerX = buffer_read(buf, buffer_s16);
                 var playerY = buffer_read(buf, buffer_s16);
                 
@@ -46,7 +46,29 @@
                     ds_map_delete(playerMap, pad_index);
                 }
             } else {
-                //TODO: Fill this in for client (fill it in on server first)
+                var socket = buffer_read(buf, buffer_u8);
+                var isConnected = buffer_read(buf, buffer_bool);
+                
+                if (isConnected) {
+                    ds_map_add(clientMap, socket, ds_map_create());
+                } else {
+                    //destroy all player objects in playerMap
+                    if (ds_map_exists(clientMap, socket)) {
+                        var playerMap = ds_map_find_value(clientMap, socket);
+                        if (ds_map_size(playerMap) > 0) {
+                            var pad_index = ds_map_find_first(playerMap);
+                            for (var iPadIdx = 0; iPadIdx < ds_map_size(playerMap); iPadIdx++) {
+                                var player = ds_map_find_value(playerMap, pad_index);
+                                with (player) instance_destroy();
+                                pad_index = ds_map_find_next(playerMap, pad_index);
+                            }
+                        }
+                    }
+                    
+                    //Delete maps
+                    ds_map_destroy(ds_map_find_value(clientMap, socket)); //destroy the player map
+                    ds_map_delete(clientMap, socket); //delete the socket from the map              
+                }
             }
             
             break;
