@@ -7,6 +7,12 @@
             ds_list_add(socketList, socket);
             ds_map_add(clientMap, socket, ds_map_create());
             
+            //Update the connected client, telling it it's socket number
+            buffer_seek(buff, buffer_seek_start, 0);
+            buffer_write(buff, buffer_u8, SVR_SEND_CLIENT_SOCKET_DATA);
+            buffer_write(buff, buffer_u8, socket);
+            network_send_packet(socket, buff, buffer_tell(buff));
+            
             //Update all clients of client connection
             buffer_seek(buff, buffer_seek_start, 0);
             

@@ -28,6 +28,7 @@
             <string>///Connect the client, setup test variables
 //Connect the client
 clientSocket = network_create_socket(global.game_server_type);
+clientSocketOnServer = -1;
 
 var server = network_connect(clientSocket, "127.0.0.1", global.game_server_port);
 if (server &lt; 0) {
@@ -91,11 +92,24 @@ buff = buffer_create(256, buffer_grow, 1);
             <string>///Initialise Gamepads and Players
 players = ds_map_create();
 
+//If there isn't a gamepad connected, create a player who is controlled by the keyboard
 var gp_num = gamepad_get_device_count();
+var gamepadIsConnected = false;
 for (var i = 0; i &lt; gp_num; i++) {
     if (gamepad_is_connected(i)) {
+        gamepadIsConnected = true;
         show_debug_message("Gamepad " + string(i) + " is connected.");
     }
+}
+
+if (!gamepadIsConnected) {
+    var pad_index = 0;
+    var player = instance_create(100, 100 + 50 * pad_index, obj_cli_playerController);
+    ds_map_add(players, pad_index, player);
+    player.isGamepadControlled = false;
+    player.pad_index = pad_index;
+    
+    scr_client_sendPlayerConnection(pad_index, CONNECTION_DATA_CONNECTED);
 }
 </string>
           </argument>
@@ -185,19 +199,47 @@ show_debug_message("event type: " + e_type + "#pad index:" + string(pad_index));
 
 switch (e_type) {
     case "gamepad discovered":
-        var player = instance_create(100, 100 + 50 * pad_index, obj_cli_playerController);
-        ds_map_add(players, pad_index, player);
-        player.pad_index = pad_index;
-        player.is_client = true;
-        gamepad_set_axis_deadzone(pad_index, 0.15);
-        
-        scr_client_sendPlayerConnection(pad_index, CONNECTION_DATA_CONNECTED);
+        //If there is only a keyboard connected
+        if (ds_map_size(players) == 1 &amp;&amp; !ds_map_find_first(players).isGamepadControlled) {
+            //Change the keyboard playercontroller to a gamepad playercontroller
+            
+            
+            //There is a small chance the pad_index is not the same as the,
+            // final players pad_index because of that we'll redo the map,
+            // and update the players pad_index
+            var players_pad_index = ds_map_find_first(players); //Get the pad index from the map
+            var player = players[? players_pad_index]; //Get the player from the map
+            player.isGamepadControlled = true;
+            player.pad_index = pad_index;
+            gamepad_set_axis_deadzone(pad_index, 0.15);
+            
+            //redo the map
+            ds_map_empty(players);
+            ds_map_add(players, pad_index, player);
+        } else {
+            //Connect a new player
+            var player = instance_create(100, 100 + 50 * pad_index, obj_cli_playerController);
+            ds_map_add(players, pad_index, player);
+            player.isGamepadControlled = true;
+            player.pad_index = pad_index;
+            gamepad_set_axis_deadzone(pad_index, 0.15);
+            
+            scr_client_sendPlayerConnection(pad_index, CONNECTION_DATA_CONNECTED);
+        }
     break;
     case "gamepad lost":
-        with (players[? pad_index]) instance_destroy();
-        ds_map_delete(players, pad_index);
-        
-        scr_client_sendPlayerConnection(pad_index, CONNECTION_DATA_DISCONNECTED);
+        //If it was the last player
+        if (ds_map_size(players) == 1) {
+            //Convert gamepad player to keyboard player
+            var player = players[? pad_index];
+            player.isGamepadControlled = false;
+        } else {
+            //Disconnect player
+            with (players[? pad_index]) instance_destroy();
+            ds_map_delete(players, pad_index);
+            
+            scr_client_sendPlayerConnection(pad_index, CONNECTION_DATA_DISCONNECTED);
+        }
     break;
 }
 </string>

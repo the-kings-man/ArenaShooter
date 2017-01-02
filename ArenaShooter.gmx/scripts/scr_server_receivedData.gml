@@ -22,8 +22,6 @@
             }
             break;
         case TEST_SEND_PLAYER_DATA:
-            //TODO: Fill this in sso that player move h and move v data will be processed
-            show_debug_message("Received player data");
             var numPlayers = buffer_read(buf, buffer_u8);
             
             //Find the player map

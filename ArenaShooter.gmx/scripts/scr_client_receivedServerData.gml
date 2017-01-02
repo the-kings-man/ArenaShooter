@@ -16,13 +16,28 @@
                 ds_list_add(testObjList, buffer_read(buf, buffer_s16)); //y
             }
             break;
-        case SVR_SEND_GAME_DATA:
+        case SVR_SEND_GAME_DATA: //Game data sent every step
+        
+            //Update the visible player objects
+            var numClients = buffer_read(buf, buffer_u8);
             
+            for (var iCli = 0; iCli < numClients; iCli++) {
+                var socket = buffer_read(buf, buffer_u8);
+                var playerMap = ds_map_find_value(clientMap, socket);
+                var numPlayers = buffer_read(buf, buffer_u8);
+                
+                for (var iPla = 0; iPla < numPlayers; iPla++) {
+                    var pad_index = buffer_read(buf, buffer_u8);
+                    var player = ds_map_find_value(playerMap, pad_index);
+                    player.speed = buffer_read(buf, buffer_f32);
+                    player.direction = buffer_read(buf, buffer_f32);
+                }
+            }
             break;
         case SVR_SEND_CONNECTION_DATA:
             var isPlayer = (buffer_read(buf, buffer_u8) == CONNECTION_DATA_PLAYER);
             
-            if (isPlayer) {
+            if (isPlayer) { //Player is connecting
                 var socket = buffer_read(buf, buffer_u8);
                 var pad_index = buffer_read(buf, buffer_u8);
                 var isConnected = buffer_read(buf, buffer_bool);
@@ -35,12 +50,17 @@
                 }
                 
                 var playerMap = ds_map_find_value(clientMap, socket);
-                if (isConnected) {
+                if (isConnected) { //Player has connected, add them to game
                     var player = instance_create(playerX, playerY, obj_cli_player);
                     ds_map_add(playerMap, pad_index, player);
-                    //TODO: Make visible player on clientside track what client socket he's from
+                    player.socket = socket;
                     player.pad_index = pad_index;
                     player.is_client = true;
+                    
+                    //player is for this client, make controller follow it around
+                    if (socket == clientSocketOnServer) {
+                        players[? pad_index].visiblePlayerToFollow = player;
+                    }
                 } else {
                     with (playerMap[? pad_index]) instance_destroy();
                     ds_map_delete(playerMap, pad_index);
@@ -71,6 +91,10 @@
                 }
             }
             
+            break;
+        case SVR_SEND_CLIENT_SOCKET_DATA:
+            var socket = buffer_read(buf, buffer_u8);
+            clientSocketOnServer = socket;
             break;
     }
 }
