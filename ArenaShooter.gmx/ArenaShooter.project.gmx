@@ -8,6 +8,52 @@
   <sprites name="sprites"/>
   <backgrounds name="background"/>
   <paths name="paths"/>
+  <scripts name="scripts">
+    <scripts name="Object Scripts">
+      <scripts name="server">
+        <script>scripts\scr_server_connectDisconnect.gml</script>
+        <script>scripts\scr_server_receivedData.gml</script>
+        <script>scripts\scr_server_checkSendPlayerData.gml</script>
+      </scripts>
+      <scripts name="client">
+        <script>scripts\scr_client_checkSendPlayerData.gml</script>
+        <script>scripts\scr_client_sendPlayerData.gml</script>
+        <script>scripts\scr_client_sendPlayerConnection.gml</script>
+        <script>scripts\scr_client_receivedServerData.gml</script>
+      </scripts>
+    </scripts>
+    <script>scripts\draw_set_text_button.gml</script>
+    <script>scripts\draw_set_text_standard.gml</script>
+  </scripts>
+  <objects name="objects">
+    <object>objects\obj_menu</object>
+    <object>objects\obj_server</object>
+    <object>objects\obj_client</object>
+    <object>objects\obj_test</object>
+    <object>objects\obj_cli_player</object>
+    <object>objects\obj_cli_playerController</object>
+    <object>objects\obj_svr_player</object>
+    <objects name="UI">
+      <object>objects\parent_btn</object>
+      <object>objects\obj_btn_createServer</object>
+    </objects>
+  </objects>
+  <rooms name="rooms">
+    <room>rooms\rm_menu</room>
+    <room>rooms\rm_test</room>
+  </rooms>
+  <constants number="10">
+    <constant name="TEST_SEND_DATA">3</constant>
+    <constant name="TEST_SEND_PLAYER_DATA">1</constant>
+    <constant name="TEST_SEND_PLAYER_CONNECTION">2</constant>
+    <constant name="SVR_SEND_GAME_DATA">0</constant>
+    <constant name="SVR_SEND_CONNECTION_DATA">4</constant>
+    <constant name="CONNECTION_DATA_CLIENT">0</constant>
+    <constant name="CONNECTION_DATA_PLAYER">1</constant>
+    <constant name="CONNECTION_DATA_DISCONNECTED">false</constant>
+    <constant name="CONNECTION_DATA_CONNECTED">true</constant>
+    <constant name="SVR_SEND_CLIENT_SOCKET_DATA">5</constant>
+  </constants>
   <help>
     <rtf>help.rtf</rtf>
   </help>
