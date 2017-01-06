@@ -59,7 +59,8 @@ var mY = mouse_y;
 if (isHovering) {
     if (mX &lt; x || mY &lt; y || mX &gt; x + width || mY &gt; y + height) {
         isHovering = false;
-        event_perform(ev_mouse_leave, 0);
+        window_set_cursor(cr_default);
+        event_perform(ev_mouse, ev_mouse_leave);
     }
 } else {
     if (mX &gt; x) {
@@ -67,7 +68,8 @@ if (isHovering) {
             if (mX &lt; x + width) {
                 if (mY &lt; y + height) {
                     isHovering = true;
-                    event_perform(ev_mouse_enter, 0);
+                    window_set_cursor(cr_drag);
+                    event_perform(ev_mouse, ev_mouse_enter);
                 }
             }
         }
@@ -96,13 +98,11 @@ if (isHovering) {
             <string>///Clicking code
 if (isHovering) {
     if (mouse_check_button_pressed(mb_left)) {
-        event_perform(ev_left_press, 0);
-    }
-    if (mouse_check_button(mb_left)) {
-        event_perform(ev_left_button, 0);
-    }
-    if (mouse_check_button_released(mb_left)) {
-        event_perform(ev_left_release, 0);
+        event_perform(ev_mouse, ev_left_press);
+    } else if (mouse_check_button(mb_left)) {
+        event_perform(ev_mouse, ev_left_button);
+    } else if (mouse_check_button_released(mb_left)) {
+        event_perform(ev_mouse, ev_left_release);
     }
 }
 </string>
@@ -128,8 +128,10 @@ if (isHovering) {
           <argument>
             <kind>1</kind>
             <string>///Draws the button
-draw_set_color(c_black);
-draw_button(x, y, x + width, y + height, !isHovering);
+if (isHovering) draw_set_color(c_black);
+else draw_set_color(c_dkgray);
+
+draw_button(x, y, x + width, y + height, true);
 draw_set_text_button(); draw_set_color(c_white);
 var halfW = width / 2;
 var halfH = height / 2;
