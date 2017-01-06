@@ -1,5 +1,9 @@
 TODOS
 
+BUGS
+====================================================
+DAVE - Multiplayer lag and player updating bug
+
 MECHANICS
 ====================================================
  - Crouch, Crawl, Building Heights
@@ -26,3 +30,5 @@ DONE - Write Basic Networking, also basic local play
 THEME, SPRITES, SETTING
 ====================================================
 - Robots vs Man (LAZORZZ)
+- Sprite Theme
+ADRIAN - Color Palette
