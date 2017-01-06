@@ -101,7 +101,7 @@ move_v_prev = move_v;
         <arguments>
           <argument>
             <kind>0</kind>
-            <string>isGamepadConnected</string>
+            <string>isGamepadControlled</string>
           </argument>
           <argument>
             <kind>0</kind>

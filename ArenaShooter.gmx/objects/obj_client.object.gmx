@@ -106,8 +106,8 @@ if (!gamepadIsConnected) {
     var pad_index = 0;
     var player = instance_create(100, 100 + 50 * pad_index, obj_cli_playerController);
     ds_map_add(players, pad_index, player);
-    player.isGamepadControlled = false;
     player.pad_index = pad_index;
+    player.isGamepadControlled = false;
     
     scr_client_sendPlayerConnection(pad_index, CONNECTION_DATA_CONNECTED);
 }
@@ -200,7 +200,7 @@ show_debug_message("event type: " + e_type + "#pad index:" + string(pad_index));
 switch (e_type) {
     case "gamepad discovered":
         //If there is only a keyboard connected
-        if (ds_map_size(players) == 1 &amp;&amp; !ds_map_find_first(players).isGamepadControlled) {
+        if (ds_map_size(players) == 1 &amp;&amp; !ds_map_find_value(players, ds_map_find_first(players)).isGamepadControlled) {
             //Change the keyboard playercontroller to a gamepad playercontroller
             
             
