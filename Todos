@@ -1,0 +1,28 @@
+TODOS
+
+MECHANICS
+====================================================
+ - Crouch, Crawl, Building Heights
+ - Unlockables[Weapon Upgrades, Perks]
+ - Unlimited Ammo, Unlimited Mag
+ - Powerups, Medkit
+ - Health
+ - Spawning
+
+GAME MODES
+====================================================
+- Waves (Arcade)
+- Endless
+
+LEVEL EDITOR
+====================================================
+-
+
+NETWORKING, LOCAL PLAY
+====================================================
+DONE - Write Basic Networking, also basic local play
+- Optimise Networking
+
+THEME, SPRITES, SETTING
+====================================================
+- Robots vs Man (LAZORZZ)
