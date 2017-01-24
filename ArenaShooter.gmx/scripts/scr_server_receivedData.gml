@@ -21,7 +21,7 @@
                 }
             }
             break;
-        case TEST_SEND_PLAYER_DATA:
+        case CLI_SEND_PLAYER_DATA:
             var numPlayers = buffer_read(buf, buffer_u8);
             
             //Find the player map
@@ -36,7 +36,7 @@
                 player.move_v = buffer_read(buf, buffer_f32);
             }
             break;
-        case TEST_SEND_PLAYER_CONNECTION:
+        case CLI_SEND_CONNECTION_DATA:
             var pad_index = buffer_read(buf, buffer_u8);
             var isConnected = buffer_read(buf, buffer_bool);
             show_debug_message("SERVER HAS RECOGNISED PLAYER CONNECTION. #pad_index: " +  string(pad_index) + ", isConnected: " + string(isConnected));
@@ -64,8 +64,13 @@
             buffer_write(buff, buffer_u8, socket);
             buffer_write(buff, buffer_u8, pad_index);
             buffer_write(buff, buffer_bool, isConnected);
-            buffer_write(buff, buffer_s16, playerMap[? pad_index].x); //x of player instance
-            buffer_write(buff, buffer_s16, playerMap[? pad_index].y); //y of player instance
+            if (isConnected) {
+                buffer_write(buff, buffer_s16, playerMap[? pad_index].x); //x of player instance
+                buffer_write(buff, buffer_s16, playerMap[? pad_index].y); //y of player instance
+            } else {
+                buffer_write(buff, buffer_s16, 0);
+                buffer_write(buff, buffer_s16, 0);
+            }
             
             var bufferSize = buffer_tell(buff);
             for (var i = 0; i < ds_list_size(socketList); i++) {
@@ -73,5 +78,28 @@
             }
             
             break;
+        case CLI_SEND_PAD_INDEX_CHANGE: 
+            var old_pad_index = buffer_read(buf, buffer_u8);
+            var pad_index = buffer_read(buf, buffer_u8);
+            
+            //Find the player map
+            var socket = ds_map_find_value(async_load, "id");
+            var playerMap = ds_map_find_value(clientMap, socket);
+            
+            playerMap[? pad_index] = playerMap[? old_pad_index];
+            ds_map_delete(playerMap, old_pad_index);
+            
+            //update all clients of change
+            buffer_seek(buff, buffer_seek_start, 0);
+            buffer_write(buff, buffer_u8, SVR_SEND_PAD_INDEX_CHANGE); //Command
+            buffer_write(buff, buffer_u8, socket);
+            buffer_write(buff, buffer_u8, old_pad_index);
+            buffer_write(buff, buffer_u8, pad_index);
+            var bufferSize = buffer_tell(buff);
+            for (var i = 0; i < ds_list_size(socketList); i++) {
+                network_send_packet(ds_list_find_value(socketList, i), buff, bufferSize);
+            }
+            break;
     }
+    
 }

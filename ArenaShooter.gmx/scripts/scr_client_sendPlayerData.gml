@@ -2,7 +2,7 @@
 {    
     buffer_seek(buff, buffer_seek_start, 0);
     
-    buffer_write(buff, buffer_u8, TEST_SEND_PLAYER_DATA); //Command
+    buffer_write(buff, buffer_u8, CLI_SEND_PLAYER_DATA); //Command
     
     buffer_write(buff, buffer_u8, 0); //Placeholder for number of players data to process
 

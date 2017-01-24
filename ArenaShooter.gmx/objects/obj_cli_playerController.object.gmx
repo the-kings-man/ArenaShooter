@@ -325,7 +325,7 @@ if (instance_exists(visiblePlayerToFollow)) {
           <argument>
             <kind>1</kind>
             <string>draw_set_color(c_blue);
-draw_text(x, y - 25, "Speed: " + string(speed) + ", lh: " + string(move_h) + ", lv: " + string(move_v));
+draw_text(x, y - 25, "cli ctrl, Speed: " + string(speed) + ", lh: " + string(move_h) + ", lv: " + string(move_v));
 </string>
           </argument>
         </arguments>

@@ -5,6 +5,7 @@
     var command = buffer_read(buf, buffer_u8);
     
     switch (command) {
+    /*
         case TEST_SEND_DATA:
             testName = buffer_read(buf, buffer_string);
             
@@ -16,6 +17,7 @@
                 ds_list_add(testObjList, buffer_read(buf, buffer_s16)); //y
             }
             break;
+            */
         case SVR_SEND_GAME_DATA: //Game data sent every step
         
             //Update the visible player objects
@@ -59,7 +61,11 @@
                     
                     //player is for this client, make controller follow it around
                     if (socket == clientSocketOnServer) {
-                        players[? pad_index].visiblePlayerToFollow = player;
+                        if (ds_map_exists(players, pad_index)) { //TODO: test this extensively to see if this check doesn't allow the following of a player
+                            players[? pad_index].visiblePlayerToFollow = player;
+                        } else {
+                            show_debug_message("Trying to setup on client a player to follow for pad_index: " + string(pad_index) + ". But it that player didn't exist in the players map.");
+                        }
                     }
                 } else {
                     with (playerMap[? pad_index]) instance_destroy();
@@ -92,9 +98,18 @@
             }
             
             break;
-        case SVR_SEND_CLIENT_SOCKET_DATA:
+        case SVR_SEND_CLIENT_FIRST_CONNECT:
             var socket = buffer_read(buf, buffer_u8);
             clientSocketOnServer = socket;
+            break;
+        case SVR_SEND_PAD_INDEX_CHANGE:
+            var socket = buffer_read(buf, buffer_u8);
+            var old_pad_index = buffer_read(buf, buffer_u8);
+            var pad_index = buffer_read(buf, buffer_u8);
+            
+            var playerMap = ds_map_find_value(clientMap, socket);
+            playerMap[? pad_index] = playerMap[? old_pad_index];
+            ds_map_delete(playerMap, old_pad_index);
             break;
     }
 }

@@ -5,37 +5,23 @@
   <visible>-1</visible>
   <depth>0</depth>
   <persistent>0</persistent>
-  <parentName>&lt;undefined&gt;</parentName>
+  <parentName>parent_btn</parentName>
   <maskName>&lt;undefined&gt;</maskName>
   <events>
     <event eventtype="0" enumb="0">
       <action>
         <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
+        <id>604</id>
+        <kind>0</kind>
         <userelative>0</userelative>
         <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
+        <useapplyto>0</useapplyto>
+        <exetype>1</exetype>
+        <functionname>action_inherited</functionname>
         <codestring></codestring>
         <whoName>self</whoName>
         <relative>0</relative>
         <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>///Global vars
-global.connect_ip = "127.0.0.1";
-
-global.game_server_type = network_socket_tcp;
-global.game_server_port = 6510;
-global.game_server_maxplayers = 16;
-
-global.gamepad_deadzone = 0.15;
-</string>
-          </argument>
-        </arguments>
       </action>
       <action>
         <libid>1</libid>
@@ -53,9 +39,35 @@ global.gamepad_deadzone = 0.15;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Game setup
-global.connection_timeout = 4000;
-network_set_config(network_config_connect_timeout, global.connection_timeout);
+            <string>///Setup vars
+text = "Connect to Server";
+width = string_width(text) + 10;
+height = string_height(text) + 10;
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="6" enumb="7">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>with (obj_menu) {
+    scr_menu_connectToServer();
+}
 </string>
           </argument>
         </arguments>

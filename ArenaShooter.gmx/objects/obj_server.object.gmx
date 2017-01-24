@@ -27,11 +27,6 @@
             <kind>1</kind>
             <string>///Create server
 
-//TODO: Move these to the menu object when ready, as there could potentially be more than 1 server object
-global.game_server_type = network_socket_tcp;
-global.game_server_port = 6510;
-global.game_server_maxplayers = 16;
-
 socketList = ds_list_create(); //A list of sockets connected to the server
 clientMap = ds_map_create(); //A map of sockets to client data
                              //Client data is a map which links pad_index to player instance on server
@@ -163,33 +158,6 @@ if (doSend) {
         network_send_packet(ds_list_find_value(socketList, i), buff, bufferSize);
     }
 }
-
-//OLD TEST DATA, REMOVE WHEN NOT NEDED
-/*
-testBuf = buffer_create(256, buffer_grow, 1);
-global.testBuf = testBuf;
-
-buffer_seek(testBuf, buffer_seek_start, 0);
-
-//Constant value tells the client how to process the data
-buffer_write(testBuf, buffer_u8, TEST_SEND_DATA); 
-//data to process
-buffer_write(testBuf, buffer_string, "testing");
-
-//write test object data
-buffer_write(testBuf, buffer_u8, instance_number(obj_test));
-with (obj_test) {
-    buffer_write(global.testBuf, buffer_s16, color);
-    buffer_write(global.testBuf, buffer_s16, x);
-    buffer_write(global.testBuf, buffer_s16, y);
-}
-
-//Send data to clients
-var bufSize = buffer_tell(testBuf);
-for (var i = 0; i &lt; ds_list_size(socketList); i++) {
-    network_send_packet(ds_list_find_value(socketList, i), testBuf, bufSize);
-}
-*/
 </string>
           </argument>
         </arguments>

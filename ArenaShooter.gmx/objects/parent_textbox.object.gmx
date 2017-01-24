@@ -25,9 +25,15 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Initialisation
-socket = -1;
-pad_index = -1;
+            <string>///Setup vars
+isHovering = false;
+isSelected = false;
+
+placeholder = "";
+text = "";
+width = 0;
+height = 0;
+padding = 4;
 </string>
           </argument>
         </arguments>
@@ -48,15 +54,10 @@ pad_index = -1;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Movement Variables
-
-movSpd = 4;
-
-move_h = 0;
-move_v = 0;
-
-speed_prev = -1;
-direction_prev = -1;
+            <string>///Cursor vars
+csrOn = true;
+csrCounter = 0;
+csrTime = room_speed;
 </string>
           </argument>
         </arguments>
@@ -79,9 +80,66 @@ direction_prev = -1;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Set previous move variables
-direction_prev = direction;
-speed_prev = speed;
+            <string>///Mouse enter / leave
+var mX = mouse_x;
+var mY = mouse_y;
+
+if (isHovering) {
+    if (mX &lt; x || mY &lt; y || mX &gt; x + width || mY &gt; y + height) {
+        isHovering = false;
+        window_set_cursor(cr_default);
+        event_perform(ev_mouse, ev_mouse_leave);
+    }
+} else {
+    if (mX &gt; x) {
+        if (mY &gt; y) {
+            if (mX &lt; x + width) {
+                if (mY &lt; y + height) {
+                    isHovering = true;
+                    window_set_cursor(cr_drag);
+                    event_perform(ev_mouse, ev_mouse_enter);
+                }
+            }
+        }
+    }
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>parent_textbox</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Clicking code
+if (isHovering) {
+    if (mouse_check_button_pressed(mb_left)) {
+        event_perform(ev_mouse, ev_left_press);
+    } else if (mouse_check_button(mb_left)) {
+        event_perform(ev_mouse, ev_left_button);
+    } else if (mouse_check_button_released(mb_left)) {
+        event_perform(ev_mouse, ev_left_release);
+        isSelected = true;
+        
+        keyboard_string = text;
+    }
+} else {
+    if (mouse_check_button_released(mb_left)) {
+        isSelected = false;
+    }
+}
 </string>
           </argument>
         </arguments>
@@ -102,21 +160,14 @@ speed_prev = speed;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Move, turn, shoot
-
-/////////////////// MOVE  //////////////////////////\
-if (move_h != 0 || move_v != 0) {
-    var dir = point_direction(0, 0, move_h, move_v);
-    var spd = min(abs(move_h) + abs(move_v), 1);
-    direction = dir;
-    speed = spd * movSpd;
-} else {
-    speed = 0;
+            <string>///Keyboard input
+if (isSelected) {
+    if (keyboard_check_released(vk_anykey)) {
+        text = keyboard_string;
+        csrOn = true;
+        csrCounter = 0;
+    }
 }
-
-/////////////////// TURN  //////////////////////////
-
-/////////////////// SHOOT //////////////////////////
 </string>
           </argument>
         </arguments>
@@ -125,26 +176,6 @@ if (move_h != 0 || move_v != 0) {
     <event eventtype="8" enumb="0">
       <action>
         <libid>1</libid>
-        <id>605</id>
-        <kind>0</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>for testing only</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
         <id>603</id>
         <kind>7</kind>
         <userelative>0</userelative>
@@ -159,8 +190,48 @@ if (move_h != 0 || move_v != 0) {
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>draw_set_color(c_red);
-draw_text(x, y + 25, "svr, Speed: " + string(speed) + ", lh: " + string(move_h) + ", lv: " + string(move_v));
+            <string>///Draws the textbox
+if (isHovering) draw_set_color(c_black);
+else draw_set_color(c_dkgray);
+
+draw_rectangle(x-padding, y-padding, x+width+padding, y+height+padding, false);
+draw_set_color(c_white);
+draw_rectangle(x, y, x + width, y + height, false);
+
+draw_set_text_standard();
+if (string_length(text) != 0) {
+    //Draw text
+    draw_set_color(c_black);
+    draw_text(x, y, text);
+    
+    //Draw the cursor
+    if (isSelected) {
+        if (csrOn) {
+            var cursorX, cursorH;
+            
+            cursorH = string_height("H"); //Just the height of any random letter
+            if (string_length(text) == 0) {
+                cursorX = x;
+            } else {
+                cursorX = string_width(text) + x;
+            }
+            
+            draw_line(cursorX, y, cursorX, y + cursorH);
+        }
+        
+        csrCounter++;
+        if (csrCounter &gt; csrTime) {
+            csrOn = !csrOn;
+            csrCounter = 0;
+        }
+    }
+} else if (!isSelected) {
+    //Draw placeholder
+    draw_set_color(c_dkgray);
+    draw_text(x, y, placeholder);
+}
+
+
 </string>
           </argument>
         </arguments>

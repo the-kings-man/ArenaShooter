@@ -27,13 +27,13 @@
             <kind>1</kind>
             <string>///Connect the client, setup test variables
 //Connect the client
-clientSocket = network_create_socket(global.game_server_type);
+clientSocket = network_create_socket(global.game_server_type); //TODO: remove when confirmed we don't need this
 clientSocketOnServer = -1;
 
-var server = network_connect(clientSocket, "127.0.0.1", global.game_server_port);
+var server = network_connect(clientSocket, global.connect_ip, global.game_server_port);
 if (server &lt; 0) {
     //Error
-    //TODO: Handle more gracefully
+    //TODO: Handle more gracefully, show error message and then return to menu
     show_message("ERROR - Cannot connect to server, error code: " + string(server));
     game_end();
 } else {
@@ -99,17 +99,13 @@ for (var i = 0; i &lt; gp_num; i++) {
     if (gamepad_is_connected(i)) {
         gamepadIsConnected = true;
         show_debug_message("Gamepad " + string(i) + " is connected.");
+        
+        scr_client_addLocalPlayer(i, true);
     }
 }
 
 if (!gamepadIsConnected) {
-    var pad_index = 0;
-    var player = instance_create(100, 100 + 50 * pad_index, obj_cli_playerController);
-    ds_map_add(players, pad_index, player);
-    player.pad_index = pad_index;
-    player.isGamepadControlled = false;
-    
-    scr_client_sendPlayerConnection(pad_index, CONNECTION_DATA_CONNECTED);
+    scr_client_addLocalPlayer(0, false);
 }
 </string>
           </argument>
@@ -200,9 +196,16 @@ show_debug_message("event type: " + e_type + "#pad index:" + string(pad_index));
 switch (e_type) {
     case "gamepad discovered":
         //If there is only a keyboard connected
-        if (ds_map_size(players) == 1 &amp;&amp; !ds_map_find_value(players, ds_map_find_first(players)).isGamepadControlled) {
+        var isKeyboard = false;
+        if (ds_map_size(players) == 1) {
+            var player = ds_map_find_value(players, ds_map_find_first(players))
+            if (instance_exists(player) &amp;&amp; !is_undefined(player.isGamepadControlled) &amp;&amp; !player.isGamepadControlled) {
+                isKeyboard = true;
+            }
+        }
+        
+        if (isKeyboard) {
             //Change the keyboard playercontroller to a gamepad playercontroller
-            
             
             //There is a small chance the pad_index is not the same as the,
             // final players pad_index because of that we'll redo the map,
@@ -216,15 +219,15 @@ switch (e_type) {
             //redo the map
             ds_map_empty(players);
             ds_map_add(players, pad_index, player);
+            
+            if (players_pad_index != pad_index) scr_client_sendPadIndexChange(players_pad_index, pad_index);
+            
+            show_debug_message("Changed keyboard controller to gamepad controller old pi: " + string(players_pad_index) + ", pi: " + string(pad_index));
         } else {
             //Connect a new player
-            var player = instance_create(100, 100 + 50 * pad_index, obj_cli_playerController);
-            ds_map_add(players, pad_index, player);
-            player.isGamepadControlled = true;
-            player.pad_index = pad_index;
-            gamepad_set_axis_deadzone(pad_index, 0.15);
+            scr_client_addLocalPlayer(pad_index, true);
             
-            scr_client_sendPlayerConnection(pad_index, CONNECTION_DATA_CONNECTED);
+            show_debug_message("Connected a new player in pad_index: " + string(pad_index));
         }
     break;
     case "gamepad lost":

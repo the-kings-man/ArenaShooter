@@ -5,7 +5,7 @@
     
     buffer_seek(buff, buffer_seek_start, 0);
     
-    buffer_write(buff, buffer_u8, TEST_SEND_PLAYER_CONNECTION); // Command
+    buffer_write(buff, buffer_u8, CLI_SEND_CONNECTION_DATA); // Command
     
     buffer_write(buff, buffer_u8, pad_index); // Pad Index
     
