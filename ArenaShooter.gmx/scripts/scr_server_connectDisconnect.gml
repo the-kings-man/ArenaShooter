@@ -12,12 +12,40 @@
             buffer_seek(buff, buffer_seek_start, 0);
             buffer_write(buff, buffer_u8, SVR_SEND_CLIENT_FIRST_CONNECT);
             
-            // Tell client it's socket number
-            buffer_write(buff, buffer_u8, socket); 
+            buffer_write(buff, buffer_u8, socket); // Tell client it's socket number
             
             //Tell client current game state
+            var numClients = ds_map_size(clientMap);
+            buffer_write(buff, buffer_u8, numClients); //Number of clients data to process
             
-            
+            //Loop through all players on all different clients,
+            //send all data to client
+            var _socket = ds_map_find_first(clientMap);
+            show_debug_message("SVR, Client Socket: " + string(_socket));
+            for (var iSocket = 0; iSocket < numClients; iSocket++) {
+                buffer_write(buff, buffer_u8, _socket); //Client socket data
+                
+                // Loop through playerMap for this client
+                var playerMap = ds_map_find_value(clientMap, _socket);
+                var pad_index = ds_map_find_first(playerMap);
+                var numPlayers = ds_map_size(playerMap);
+                buffer_write(buff, buffer_u8, numPlayers); //number of players placeholder
+                
+                for (var iPadIdx = 0; iPadIdx < numPlayers; iPadIdx++) {
+                    var player = ds_map_find_value(playerMap, pad_index);
+                    show_debug_message("SVR, Pad Index: " + string(pad_index));
+                    
+                    buffer_write(buff, buffer_u8, pad_index);
+                    buffer_write(buff, buffer_s16, player.x);
+                    buffer_write(buff, buffer_s16, player.y);
+                    buffer_write(buff, buffer_f32, player.speed);
+                    buffer_write(buff, buffer_f32, player.direction);
+                    
+                    pad_index = ds_map_find_next(playerMap, pad_index);
+                }
+                    
+                _socket = ds_map_find_next(clientMap, _socket);
+            }
             network_send_packet(socket, buff, buffer_tell(buff));
             
             //Update all clients of client connection

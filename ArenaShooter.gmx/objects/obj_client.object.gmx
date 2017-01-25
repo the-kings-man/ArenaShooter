@@ -278,6 +278,50 @@ if (eventid == clientSocket) {
         </arguments>
       </action>
     </event>
+    <event eventtype="8" enumb="64">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>var lh = 20; // Line Height
+var xd = 10; // x to draw
+var yd = 10; // y to draw
+
+
+var lineNum = 0;
+var socket = ds_map_find_first(clientMap);
+for (var iClient = 0; iClient &lt; ds_map_size(clientMap); iClient++) {
+    draw_text(xd, yd + lineNum * lh, "Client " + string(iClient) + ": " + string(socket));
+    lineNum++;
+    
+    var playerMap = ds_map_find_value(clientMap, socket);
+    var pad_index = ds_map_find_first(playerMap);
+    for (var iPlayer = 0; iPlayer &lt; ds_map_size(playerMap); iPlayer++) {
+        draw_text(xd, yd + lineNum * lh, " - Player " + string(iPlayer) + ": " + string(pad_index));
+        lineNum++;
+        
+        pad_index = ds_map_find_next(playerMap, pad_index);
+    }
+    
+    socket = ds_map_find_next(clientMap, socket);
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
     <event eventtype="8" enumb="0">
       <action>
         <libid>1</libid>

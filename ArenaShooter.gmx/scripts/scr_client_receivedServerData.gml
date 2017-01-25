@@ -31,6 +31,8 @@
                 for (var iPla = 0; iPla < numPlayers; iPla++) {
                     var pad_index = buffer_read(buf, buffer_u8);
                     var player = ds_map_find_value(playerMap, pad_index);
+                    player.x = buffer_read(buf, buffer_s16);
+                    player.y = buffer_read(buf, buffer_s16);
                     player.speed = buffer_read(buf, buffer_f32);
                     player.direction = buffer_read(buf, buffer_f32);
                 }
@@ -101,6 +103,39 @@
         case SVR_SEND_CLIENT_FIRST_CONNECT:
             var socket = buffer_read(buf, buffer_u8);
             clientSocketOnServer = socket;
+            //TODO: Also update client of current game state
+            
+            var numClients = buffer_read(buf, buffer_u8); //Get number of clients to process
+            
+            for (var iClient = 0; iClient < numClients; iClient++) {
+                var clientSocket = buffer_read(buf, buffer_u8);
+                show_debug_message("Client Socket: " + string(clientSocket));
+                
+                if (!ds_map_exists(clientMap, clientSocket)) {
+                    ds_map_add(clientMap, clientSocket, ds_map_create());
+                }
+                
+                //Loop through players, create the client versions of them if needed
+                // and setup their variables
+                var playerMap = ds_map_find_value(clientMap, clientSocket);
+                var numPlayers = buffer_read(buf, buffer_u8);
+                for (var iPlayer = 0; iPlayer < numPlayers; iPlayer++) {
+                    var pad_index = buffer_read(buf, buffer_u8);
+                    show_debug_message("Pad Index: " + string(pad_index));
+                    var player = noone;
+                    if (ds_map_exists(playerMap, pad_index)) {
+                        player = ds_map_find_value(playerMap, pad_index);
+                    } else {
+                        player = instance_create(0, 0, obj_cli_player);
+                        ds_map_add(playerMap, pad_index, player);
+                    }
+                    player.x = buffer_read(buf, buffer_s16);
+                    player.y = buffer_read(buf, buffer_s16);
+                    player.speed = buffer_read(buf, buffer_f32);
+                    player.direction = buffer_read(buf, buffer_f32);
+                }
+            }
+            
             break;
         case SVR_SEND_PAD_INDEX_CHANGE:
             var socket = buffer_read(buf, buffer_u8);
