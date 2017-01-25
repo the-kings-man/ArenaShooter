@@ -3,6 +3,7 @@ TODOS
 BUGS
 ====================================================
 DAVE - Multiplayer lag and player updating bug
+     - XBOX Controller says it connects 2 different gamepads bug
 
 MECHANICS
 ====================================================
@@ -26,6 +27,8 @@ NETWORKING, LOCAL PLAY
 ====================================================
 DONE - Write Basic Networking, also basic local play
 - Optimise Networking
+DAVE - Work on connecting to different computers over same network
+       - When a client connects to the server, update them of the current game state with player and client data.
 
 THEME, SPRITES, SETTING
 ====================================================
