@@ -36,6 +36,6 @@
         
         network_send_packet(clientSocket, buff, bufferSize);
         
-        show_debug_message("CLIENT IS SENDING PLAYER DATA TO SERVER: buffer size:" + string(bufferSize));
+        //show_debug_message("CLIENT IS SENDING PLAYER DATA TO SERVER: buffer size:" + string(bufferSize));
     }
 }
